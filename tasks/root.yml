@@ -1,0 +1,5 @@
+---
+- name: ivansible.srv_cgpro root action 1
+  debug:
+    msg: action 1
+...
