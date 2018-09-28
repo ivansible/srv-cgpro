@@ -1,0 +1,148 @@
+---
+# Configure non-standard ports
+# Solve a problem with Module SIP, TCP listener on [0.0.0.0]:5061: failed to start.
+# Error Code=network address/port is already in use
+
+- name: set cgpro ports (SMTP)
+  uri:
+    url: &url_smtp_tcp "{{ cgpro_curl_url }}/Settings/SMTPListener.html"
+    headers:
+      Referer: *url_smtp_tcp
+    user: postmaster
+    password: "{{ cgpro_postmaster_password }}"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      Update: Update
+      Ports: [ 0, 1 ]
+      # Port 0 (SMTP TCP)
+      p0: "{{ cgpro_port_smtp }}"
+      a0: "[0.0.0.0]"
+      s0: "off"
+      r0: "None"
+      d0: ""
+      # Port 1 (SMTP SSL)
+      p1: "{{ cgpro_port_smtp_ssl }}"
+      a1: "[0.0.0.0]"
+      s1: "on"
+      r1: "None"
+      d1: ""
+    follow_redirects: all
+    return_content: no
+  when: cgpro_port_smtp is defined
+        and cgpro_port_smtp_ssl is defined
+
+
+- name: set cgpro ports (IMAP)
+  uri:
+    url: &url_imap_tcp
+      "{{ cgpro_curl_url }}/Settings/AccessListener.html?moduleName=IMAP&isTCP=1"
+    headers:
+      Referer: *url_imap_tcp
+    user: postmaster
+    password: "{{ cgpro_postmaster_password }}"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      Update: Update
+      Ports: [ 0, 1 ]
+      # Port 0 (IMAP TCP)
+      p0: "{{ cgpro_port_imap }}"
+      a0: "[0.0.0.0]"
+      s0: "off"
+      r0: "None"
+      d0: ""
+      # Port 1 (IMAP SSL)
+      p1: "{{ cgpro_port_imap_ssl }}"
+      a1: "[0.0.0.0]"
+      s1: "on"
+      r1: "None"
+      d1: ""
+    follow_redirects: all
+    return_content: no
+  when: cgpro_port_imap is defined
+        and cgpro_port_imap_ssl is defined
+
+
+- name: set cgpro ports (LDAP)
+  uri:
+    url: &url_ldap_tcp
+      "{{ cgpro_curl_url }}/Settings/ServiceListener.html?moduleName=LDAP&isTCP=1"
+    headers:
+      Referer: *url_ldap_tcp
+    user: postmaster
+    password: "{{ cgpro_postmaster_password }}"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      Update: Update
+      Ports: [ 0, 1 ]
+      # Port 0 (LDAP TCP)
+      p0: "{{ cgpro_port_ldap }}"
+      a0: "[0.0.0.0]"
+      s0: "off"
+      r0: "None"
+      d0: ""
+      # Port 1 (LDAP SSL)
+      p1: "{{ cgpro_port_ldap_ssl }}"
+      a1: "[0.0.0.0]"
+      s1: "on"
+      r1: "None"
+      d1: ""
+    follow_redirects: all
+    return_content: no
+  when: cgpro_port_ldap is defined
+        and cgpro_port_ldap_ssl is defined
+
+
+- name: set cgpro ports (SIP TCP)
+  uri:
+    url: &url_sip_tcp "{{ cgpro_curl_url }}/Settings/SIPTCPListener.html"
+    headers:
+      Referer: *url_sip_tcp
+    user: postmaster
+    password: "{{ cgpro_postmaster_password }}"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      Update: Update
+      Ports: [ 0, 1 ]
+      # Port 0 (SIP TCP)
+      p0: "{{ cgpro_port_sip }}"
+      a0: "[0.0.0.0]"
+      s0: "off"
+      r0: "None"
+      d0: ""
+      # Port 1 (SIP SSL)
+      p1: "{{ cgpro_port_sip_ssl }}"
+      a1: "[0.0.0.0]"
+      s1: "on"
+      r1: "None"
+      d1: ""
+    follow_redirects: all
+    return_content: no
+  when: cgpro_port_sip is defined
+        and cgpro_port_sip_ssl is defined
+
+
+- name: set cgpro ports (SIP UDP)
+  uri:
+    url: &url_sip_udp "{{ cgpro_curl_url }}/Settings/SIPUDPListener.html"
+    headers:
+      Referer: *url_sip_udp
+    user: postmaster
+    password: "{{ cgpro_postmaster_password }}"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      Update: Update
+      Ports: 0
+      # Port 0 (SIP UDP)
+      p0: "{{ cgpro_port_sip }}"
+      a0: "[0.0.0.0]"
+      r0: "None"
+      d0: ""
+    follow_redirects: all
+    return_content: no
+  when: cgpro_port_sip is defined
+...

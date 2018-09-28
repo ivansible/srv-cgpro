@@ -1,0 +1,73 @@
+---
+# CommunigatePro debian package forgets to create symbolic links
+# for mail and sendmail in /usr/bin. Let's fix it.
+
+# === /usr/bin/mail ===
+
+- name: create cgpro link for /usr/bin/mail
+  file:
+    state: link
+    src: /opt/CommuniGate/mail
+    dest: /usr/bin/mail.cgpro
+
+- name: check that /usr/bin/mail exists
+  stat:
+    path: /usr/bin/mail
+    get_checksum: no
+  register: usr_bin_mail_check
+
+- name: backup stock /usr/bin/mail
+  when: usr_bin_mail_check.stat.exists == true
+  # use readlink + hardlink to preserve node type
+  shell:
+    ln $(readlink -f /usr/bin/mail) /usr/bin/mail.stock
+  args:
+    creates: /usr/bin/mail.stock
+
+- name: setup cgpro alternative for /usr/bin/mail
+  # the `alternatives` module does not support slaves
+  # so we use a low-level command
+  command: >-
+    update-alternatives
+      --install /usr/bin/mailx mailx /opt/CommuniGate/mail 50
+      --slave   /usr/bin/mail  mail  /opt/CommuniGate/mail
+  register: mail_alternatives_result
+  changed_when:
+    mail_alternatives_result.stdout.find('forcing reinstallation') != -1
+
+# === /usr/sbin/sendmail ===
+
+- name: create cgpro link for sbin/sendmail
+  file:
+    state: link
+    src: /opt/CommuniGate/sendmail
+    dest: /usr/sbin/sendmail.cgpro
+
+- name: check that /usr/sbin/sendmail exists and is a regular file
+  stat:
+    path: /usr/sbin/sendmail
+    get_checksum: no
+  register: usr_sbin_sendmail_check
+
+- name: backup stock /usr/sbin/sendmail (if it exists and not a symbolic link)
+  when: usr_sbin_sendmail_check.stat.exists == true
+        and usr_sbin_sendmail_check.stat.isreg == true
+  command:
+    mv /usr/sbin/sendmail /usr/sbin/sendmail.stock
+  args:
+    creates: /usr/sbin/sendmail.stock
+  register: stock_sendmail_backup
+
+- name: create vanilla alternative for /usr/sbin/sendmail
+  when: stock_sendmail_backup is changed
+  alternatives:
+    name: sendmail
+    link: /usr/sbin/sendmail
+    path: /usr/sbin/sendmail.stock
+
+- name: setup cgpro alternative for /usr/sbin/sendmail
+  alternatives:
+    name: sendmail
+    link: /usr/sbin/sendmail
+    path: /opt/CommuniGate/sendmail
+...

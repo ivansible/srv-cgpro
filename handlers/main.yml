@@ -1,2 +1,33 @@
 ---
 # handlers file for ivansible.srv_cgpro
+
+- name: remove temporary cgpro skin files
+  file:
+    path: "{{ temp_skin_dir.path }}"
+    state: absent
+  when: temp_skin_dir is defined
+
+- name: disable clear-text PWD login for postmaster (restore security)
+  uri:
+    url: &url_account2
+      "{{ cgpro_curl_url }}/Domains/AccountSettings.html?domainName={{ cgpro_main_domain }}&accountName=postmaster"
+    headers:
+      Referer: *url_account2
+    user: postmaster
+    password: "{{ cgpro_postmaster_password }}"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      Update: Update
+      # SecureOnly: Default=-1 No=0 Yes=1 RequireTLS=2
+      RequireAPOP: 1
+    follow_redirects: all
+    return_content: no
+
+- name: restart cgpro service
+  systemd:
+    name: cgpro
+    state: restarted
+  become: yes
+
+...

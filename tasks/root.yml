@@ -1,5 +1,114 @@
 ---
-- name: ivansible.srv_cgpro root action 1
-  debug:
-    msg: action 1
+- import_tasks: install.yml
+  tags: cgpro_install
+
+
+- name: (re-)create cgpro base directory
+  block:
+    - name: completely purge cgpro base directory (reset all settings)
+      file:
+        path: "{{ cgpro_dir }}"
+        state: absent
+      when: cgpro_reset | bool == true
+
+    - name: check that cgpro base directory exists (appear changed if not)
+      # note: this check must go before the first service run
+      #       because the service will create the folder under test
+      stat:
+        path: "{{ cgpro_dir }}"
+      register: cgpro_dir_check
+      changed_when: cgpro_dir_check.stat.exists == false
+      notify: restart cgpro service
+
+    - name: create or recreate cgpro base directory and set permissions
+      file:
+        path: "{{ cgpro_dir }}"
+        state: directory
+        owner: root
+        group: mail
+        mode: 02770  # drwxrws---
+  tags: cgpro_dir
+
+
+# CommunigatePro debian package forgets to create symbolic links
+- name: fix symbolic links for mail and sendmail in /usr/bin
+  import_tasks: alternatives.yml
+  when: cgpro_dpkg_check | default({}) is changed
+        or cgpro_dir_check | default({}) is changed
+        or cgpro_reset | bool == true
+  tags: cgpro_alternatives
+
+- name: setup and enable cgpro service
+  import_tasks: service.yml
+  tags: cgpro_service
+
+
+- name: first time setup of a new cgpro deployment
+  import_tasks: first-run.yml
+  when: cgpro_dir_check | default({}) is changed
+  tags:
+    - cgpro_firstrun
+    - cgpro_configure
+
+
+- name: restore cgpro from backup
+  import_tasks: restore.yml
+  when: cgpro_restore | bool == true
+  tags: cgpro_restore
+
+- name: create a script for making more cgpro backups
+  # script usage: sudo -E cgpro-make-backup.sh [aes]
+  template:
+    src: cgpro-make-backup.sh
+    dest: /usr/local/bin/
+    owner: root
+    group: root
+    mode: 0750
+  tags: cgpro_restore
+
+
+
+- name: configure cgpro settings (http method)
+  import_tasks: configure.yml
+  tags: cgpro_configure
+
+- name: configure some cgpro settings (obsolete pwd method)
+  # This step is normally skipped.
+  # Prefer include (vs import) to avoid lots of skip messages.
+  include_tasks: configure-pwd.yml
+  when: false
+  tags: cgpro_configure
+
+
+- name: configure cgpro ports
+  import_tasks: configure-ports.yml
+  tags:
+    - cgpro_configure
+    - cgpro_ports
+
+- name: open cgpro ports in ubuntu firewall
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop: "{{ cgpro_open_ports }}"
+  tags: cgpro_ports
+
+- name: set server ssl certificate in cgpro
+  import_tasks: ssl.yml
+  tags: cgpro_ssl
+
+- name: configure cgpro interface skin
+  include_tasks: skin.yml
+  when: skin.name is defined and skin.url is defined
+  loop: "{{ cgpro_skins }}"
+  loop_control:
+    loop_var: skin
+    label: "{{ skin.name | default('null') }}"
+  tags: cgpro_skin
+
+- name: integrate cgpro with nginx
+  import_tasks: nginx.yml
+  tags: cgpro_nginx
+
 ...

@@ -1,0 +1,49 @@
+---
+- name: disable postfix service
+  systemd:
+    name: postfix
+    state: stopped
+    enabled: no
+  register: postfix_result
+  failed_when:
+    # do not fail if postfix service cannot be found
+    postfix_result.failed is defined
+    and postfix_result.failed == true
+    and postfix_result.msg.find('not find the requested service') == -1
+
+- name: disable and completely mask sysv-style cgpro service in /etc/init.d
+  systemd:
+    name: CommuniGate.service
+    state: stopped
+    enabled: no
+    masked: yes
+    daemon_reload: yes  # detect init.d service
+  changed_when: false
+  failed_when: false
+
+- name: create new-style systemd service descriptor for cgpro
+  copy:
+    content: |
+      # cgpro.service
+      # ansible-managed
+
+      [Unit]
+      Description=CommuniGate Pro Communication Server
+
+      [Service]
+      ExecStart=/opt/CommuniGate/CGServer --Base {{ cgpro_dir }}
+      #LimitNPROC=2000
+      #LimitCORE=2097151
+      UMask=0
+
+      [Install]
+      WantedBy=multi-user.target
+    dest: /etc/systemd/system/cgpro.service
+
+- name: enable cgpro systemd service
+  systemd:
+    name: cgpro
+    state: started
+    enabled: yes
+    daemon_reload: yes
+...

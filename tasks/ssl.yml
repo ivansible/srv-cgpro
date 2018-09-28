@@ -1,0 +1,71 @@
+---
+- name: get list of cgpro trusted certificate authorities
+  uri:
+    url: &url_cacerts "{{ cgpro_curl_url }}/Domains/TrustedCommon.html"
+    user: postmaster
+    password: "{{ cgpro_postmaster_password }}"
+    method: GET
+    return_content: yes
+  register: cacerts_page
+
+- name: add new cgpro trusted certificate authorities
+  uri:
+    url: *url_cacerts
+    headers:
+      Referer: *url_cacerts
+    user: postmaster
+    password: "{{ cgpro_postmaster_password }}"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      FormCharset: utf-8
+      Create: Set Certificate
+      Certificate: "{{ lookup('file', item.file) }}"
+    follow_redirects: all
+    return_content: no
+  when:
+    cacerts_page.content.find(
+      '<tt>%s</tt>' % item.serial
+      if item.serial != '' else
+      '<td>%s</td>' % item.name
+    ) == -1
+  loop: "{{ cgpro_trusted_cacerts }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+
+- name: verify that cgpro ssl certificate and key exist on remote host
+  file:
+    path: "{{ item }}"
+    state: file
+  loop:
+    - "{{ cgpro_ssl_cert }}"
+    - "{{ cgpro_ssl_key }}"
+
+
+- name: create directory for cgpro certificate script
+  file:
+    path: "{{ cgpro_cert_update_script | dirname }}"
+    state: directory
+
+- name: create a script for uploading certificate to cgpro
+  template:
+    src: cgpro-update-certificate.sh
+    dest: "{{ cgpro_cert_update_script }}"
+    owner: root
+    group: root
+    mode: 0750
+  register: upload_script_result
+
+- name: link a letsencrypt post-renewal hook for cgpro
+  file:
+    state: link
+    src: "{{ cgpro_cert_update_script }}"
+    dest: /etc/letsencrypt/renewal-hooks/post/cgpro
+  when: "'/letsencrypt/' in cgpro_ssl_cert"
+
+- name: upload certificate and private key to cgpro
+  command: "{{ cgpro_cert_update_script }}"
+  when: upload_script_result is changed
+        or cgpro_dir_check | default({}) is changed
+...

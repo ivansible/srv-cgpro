@@ -1,0 +1,33 @@
+---
+- name: check that role lin_nginx is deployed
+  stat:
+    path: "{{ nginx_def_site_dir }}/favicon.ico"
+    get_checksum: no
+  register: check_nginx_site_dir
+
+- name: deploy role lin_nginx
+  # Condition for this step will be rarely true.
+  # Prefer include (vs import) to avoid lots of skip messages.
+  include_role:
+    name: ivansible.lin_nginx
+  when: check_nginx_site_dir.stat.exists == false
+
+- name: deploy custom cgpro favicon
+  get_url:
+    url: "{{ cgpro_favicon_url }}"
+    dest: "{{ nginx_def_site_dir }}/favicon-cgpro.ico"
+
+- name: configure cgpro webmail for nginx
+  template:
+    src: cgpro-mail.nginx.conf
+    dest: "{{ nginx_site_dir }}/cgpro-mail.conf"
+    lstrip_blocks: yes
+  notify: restart nginx service
+
+- name: configure cgpro admin site for nginx
+  template:
+    src: cgpro-admin.nginx.conf
+    dest: "{{ nginx_site_dir }}/cgpro-admin.conf"
+    lstrip_blocks: yes
+  notify: restart nginx service
+...

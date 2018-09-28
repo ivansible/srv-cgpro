@@ -1,5 +1,10 @@
 ---
-dependencies: []
+dependencies:
+  - ivansible.lin_base       # for some common settings
+  - ivansible.nginx_base     # for ssl certificate and nginx config snippets
+  - ivansible.backup_base    # for unarchive_encrypted.yml
+  # the following roles are imported directly from tasks:
+  #- ivansible.lin_nginx
 
 galaxy_info:
   role_name: srv_cgpro
@@ -17,7 +22,11 @@ galaxy_info:
 
   galaxy_tags:
     - linux
-    - ansible
+    - server
+    - mail
+    - web
+    - cgpro
+    - communigate-pro
 
   github_branch: master
 ...

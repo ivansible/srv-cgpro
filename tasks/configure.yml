@@ -1,0 +1,77 @@
+---
+- name: set cgpro interface layout to dash
+  uri:
+    url: &url_prefs "{{ cgpro_curl_url }}/Settings/Preferences.html"
+    headers:
+      Referer: *url_prefs
+    user: postmaster
+    password: "{{ cgpro_postmaster_password }}"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      FormCharset: utf-8
+      Update: Update
+      ExpertLevel: 10  # Expert
+      AdminLanguage: ""
+      AdminSkinName: Admin-dash
+      DisplayCharset: utf-8
+    follow_redirects: all
+    return_content: no
+
+- name: configure cgpro master and enabling keys
+  uri:
+    url: &url_license "{{ cgpro_curl_url }}/Master/License.html?"
+    headers:
+      Referer: *url_license
+    user: postmaster
+    password: "{{ cgpro_postmaster_password }}"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      FormCharset: utf-8
+      Update: "I Agree"
+      Master: "{{ cgpro_master_key }}"
+      LicenseKeys: "{{ cgpro_enabling_keys }}"
+    follow_redirects: all
+    return_content: no
+  when: cgpro_master_key is defined
+        and cgpro_master_key != ''
+
+- name: update main domain in general cgpro settings
+  # note: domain name from license will override this setting
+  uri:
+    url: &url_general "{{ cgpro_curl_url }}/Settings/General.html"
+    headers:
+      Referer: *url_general
+    user: postmaster
+    password: "{{ cgpro_postmaster_password }}"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      FormCharset: utf-8
+      Update: Update
+      NewServerName: "{{ cgpro_main_domain }}"
+      LogLevel: 2  # Major & Failures
+      CrashRecovery: 1  # Enabled
+      SeparateAdminRealms: 0  # No
+    follow_redirects: all
+    return_content: no
+
+- name: set aliases of main cgpro domain
+  uri:
+    url: &url_domalias
+      "{{ cgpro_curl_url }}/Domains/DomainSettings.html?domainName={{ cgpro_main_domain }}"
+    headers:
+      Referer: *url_domalias
+    user: postmaster
+    password: "{{ cgpro_postmaster_password }}"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      FormCharset: utf-8
+      Update: Update
+      AliasName: "{{ cgpro_domains[1:] }}"
+    follow_redirects: all
+    return_content: no
+  when: cgpro_domains | length > 1
+...

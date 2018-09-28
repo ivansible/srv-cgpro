@@ -1,4 +1,98 @@
 ---
 # defaults file for ivansible.srv_cgpro
 
+cgpro_reset: no
+cgpro_restore: no
+
+
+cgpro_domains:
+  - "{{ mail_domain }}"  # test.example.com, main domain
+  - "{{ cgpro_mail_site }}"  # mail.test.example.com, secondary domains
+  - localhost
+  - local
+  - mail
+
+cgpro_main_domain: "{{ cgpro_domains | first }}"
+
+cgpro_mail_site: "mail.{{ web_domain }}"
+cgpro_admin_site: "cgpro.{{ web_domain }}"
+
+cgpro_ssl_cert: "{{ nginx_ssl_cert }}"
+cgpro_ssl_key: "{{ nginx_ssl_key }}"
+cgpro_force_ssl: yes
+
+cgpro_trusted_cacerts: []
+  #- name: Let's Encrypt Authority X3
+  #  serial: 0A0141420000015385736A0B85ECA708
+  #  file: letsencrypt-x3.cross-signed.pem
+
+
+# Please change the default. If you are restoring from a backup,
+# make sure this password matches the archived settings.
+cgpro_postmaster_password: cgpro-secret1
+
+cgpro_master_key: ""
+cgpro_enabling_keys: []
+
+
+# cgpro ports (change for non-standard)
+cgpro_port_smtp: 25       # you'll never change this one
+cgpro_port_smtp_ssl: 465
+cgpro_port_imap: 143
+cgpro_port_imap_ssl: 993
+cgpro_port_sip: 5060
+cgpro_port_sip_ssl: 5061
+cgpro_port_ldap: 389
+cgpro_port_ldap_ssl: 636
+
+cgpro_open_ports:
+  - "{{ cgpro_port_smtp | default(25) }}"
+  - "{{ cgpro_port_smtp_ssl | default(465) }}"
+  - "{{ cgpro_port_imap_ssl | default(993) }}"
+  #- "{{ cgpro_port_ximss | default(11024) }}"
+
+cgpro_curl_port: 8010  # internal cgpro http port
+cgpro_curl_url: http://localhost:{{ cgpro_curl_port }}/Master
+
+
+# See download page:
+# http://www.communigate.com/main/purchase/download.html
+cgpro_deb_url:
+  https://communigate.com/pub/CommuniGatePro/6.2/CGatePro-Linux_6.2-7_amd64.deb
+
+cgpro_favicon_url: https://communigate.com/favicon.ico
+
+# cgpro_restore_urls can be set in inventory as an array of urls
+# or from command line as a string of urls concatenated by comma
+cgpro_restore_urls: []
+
+cgpro_skins:
+  - name: Example Skin
+    #url: https://example.com/download/skins/example.tar.zip?param=test
+    #check_file: version
+    #md5sum: 1a2b3c4d5e6f708192a3b4c5d6e7f80e
+
+
+cgpro_sysctl:
+  # max open files
+  #~fs.file-max = 131072
+  # kernel threads
+  kernel.threads-max: 16000
+  # socket buffers
+  #~net.core.wmem_default = 65536
+  #~net.core.wmem_max = 1048576
+  #~net.core.rmem_default = 65536
+  #~net.core.rmem_max = 1048576
+  # netdev backlog
+  net.core.netdev_max_backlog: 4096
+  # socket buckets
+  net.ipv4.tcp_max_tw_buckets: 131072
+  # port range
+  #~net.ipv4.ip_local_port_range = 16384 65535
+
+
+# you'll never need to change these
+cgpro_cert_update_script: /usr/local/sbin/cgpro-update-cert.sh
+
+cgpro_dir: /var/CommuniGate
 ...

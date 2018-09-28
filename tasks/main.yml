@@ -3,8 +3,20 @@
 - setup:
   become: no
 
+- name: installation overview
+  debug:
+    msg:
+      - "domains: {{ cgpro_domains | join(' ') }}"
+      - "certificate: {{ cgpro_ssl_cert }}"
+      - "reset: {{ cgpro_reset }}"
+      - "restore: {{ cgpro_restore }}"
+  tags: cgpro_all
+
 # use import to become root globally
 - name: become root
   import_tasks: root.yml
   become: yes
+  tags: cgpro_all
+
+- meta: flush_handlers
 ...

@@ -1,0 +1,132 @@
+---
+# This step requires:
+# curl - to upload skin tarball to the server
+# unzip - to unpack skin archive
+
+- name: check md5 sum of the {{ skin.name }} skin check file
+  stat:
+    path: "{{ cgpro_dir }}/Accounts/WebSkins/{{ skin.name }}/{{ skin.check_file }}"
+    get_checksum: yes
+    checksum_algorithm: md5
+  become: yes
+  register: checksum_result
+  when:
+    skin.check_file is defined and skin.md5sum is defined
+  changed_when:
+    checksum_result.stat.exists == false
+    or checksum_result.stat.checksum != skin.md5sum
+  tags: cgpro_skin
+
+
+- block:
+    - name: get list of installed cgpro skins
+      uri:
+        url: &url_webskins
+          "{{ cgpro_curl_url }}/Domains/WebSkinsDomain.html?domainName={{ cgpro_main_domain }}"
+        user: postmaster
+        password: "{{ cgpro_postmaster_password }}"
+        method: GET
+        return_content: yes
+      register: webskins_page
+
+    - name: create custom unnamed skin (cgpro requires it before creating named skins)
+      uri:
+        url: *url_webskins
+        headers:
+          Referer: *url_webskins
+        user: postmaster
+        password: "{{ cgpro_postmaster_password }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          CreateDefault: "Create Custom Unnamed Skin"
+        follow_redirects: all
+        return_content: no
+      when: webskins_page.content.find('value="Create Custom Unnamed Skin"') != -1
+
+    - name: create skin {{ skin.name }} in cgpro (it's empty unless tarball is uploaded)
+      uri:
+        url: *url_webskins
+        headers:
+          Referer: *url_webskins
+        user: postmaster
+        password: "{{ cgpro_postmaster_password }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          FormCharset: utf-8
+          CreateSkin: Create
+          NewName: "{{ skin.name }}"
+        follow_redirects: all
+        return_content: no
+      when:
+        (webskins_page.content |
+         regex_search('<td><a href=\"[^\"]+\">%s</a></td>' % skin.name)
+         is none)
+
+
+    - name: reserve temporary directory for cgpro skin files
+      tempfile:
+        state: directory
+        prefix: ansible-temp.cgpro-skin.
+      register: temp_skin_dir
+      notify: remove temporary cgpro skin files
+
+    - name: unarchive cgpro skin to the temporary directory
+      unarchive:
+        src: "{{ skin.url }}"
+        remote_src: yes
+        dest: "{{ temp_skin_dir.path }}"
+
+    - name: verify that skin tarball file exists
+      file:
+        path: "{{ temp_skin_dir.path }}/{{ skin.name }}.tar"
+        state: file
+
+    - name: upload skin tarball to cgpro
+      # uri module in ansible before 2.7 cannot upload files
+      # uri module in ansible 2.7+ has "src" option for uploading a file,
+      # but it cannot be used together with "body" option.
+      # workaround: curl
+      command:
+        curl
+          --url "{{ webskins_page.url }}&SubSkin={{ skin.name }}"
+          --header "Referer{{':'}} {{ webskins_page.url }}&SubSkin={{ skin.name }}"
+          --location --silent --write-out "%{http_code}" --output /dev/null
+          --digest --user "postmaster:{{ cgpro_postmaster_password }}" \
+          --form FormCharset=utf-8
+          --form SubSkin="{{ skin.name }}"
+          --form Create="Upload File"
+          --form Upload="@{{ temp_skin_dir.path }}/{{ skin.name }}.tar"
+      register: curl_result
+      failed_when: curl_result.stdout != '200'
+
+    - name: remove temporary cgpro skin files now
+      file:
+        path: "{{ temp_skin_dir.path }}"
+        state: absent
+
+
+    - name: flush cached skin files in cgpro
+      uri:
+        url: "{{ webskins_page.url }}&SubSkin={{ skin.name }}"
+        headers:
+          Referer: "{{ webskins_page.url }}&SubSkin={{ skin.name }}"
+        user: postmaster
+        password: "{{ cgpro_postmaster_password }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          FormCharset: utf-8
+          SubSkin: "{{ skin.name }}"
+          Flush: Uncache
+        follow_redirects: all
+        return_content: no
+      changed_when: true
+      notify: restart cgpro service
+
+  # end of block
+  # no checksum provided - install always, checksum mismatch - upgrade skin
+  when: checksum_result is skipped or checksum_result is changed
+  tags: cgpro_skin
+...

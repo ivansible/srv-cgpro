@@ -1,0 +1,67 @@
+---
+- name: install utilities required to configure cgpro
+  # unzip is required by skin installer to uncompress skin files
+  # curl is required certificate and skin installers
+  # netcat is required by certificate installer script to check if cgpro is alive
+  # netcat is required by now-obsolete PWD based configurator
+  apt:
+    name:
+      - curl
+      - netcat
+      - unzip
+    state: present
+
+
+- name: we should backup /bin/mail _before_ cgpro is installed
+  block:
+    - name: check that /bin/mail exists
+      stat:
+        path: /bin/mail
+        get_checksum: no
+      register: bin_mail_check
+
+    - name: backup stock /bin/mail (cgpro installer overrides it)
+      when: bin_mail_check.stat.exists == true
+      shell:
+        ln $(readlink -f /bin/mail) /bin/mail.stock
+      args:
+        creates: /bin/mail.stock
+
+    - name: leave mark that stock /bin/mail did not exist
+      when: bin_mail_check.stat.exists == false
+      copy:
+        dest: /bin/mail.stock
+        content: |
+          #!/bin/sh
+          echo "$0 did not exist" 1>&2
+        mode: 0755
+        force: no
+  tags: cgpro_alternatives
+
+
+- name: check that cgpro is installed
+  # this check tries to save on the .deb download time
+  command: dpkg --get-selections cgatepro-linux
+  register: cgpro_dpkg_check
+  changed_when: cgpro_dpkg_check.stdout == ""
+
+- name: install cgpro package from url
+  when: cgpro_dpkg_check is changed
+        or cgpro_reset | bool == true
+  apt:
+    deb: "{{ cgpro_deb_url }}"
+    only_upgrade: "{{ cgpro_reset | bool == false }}"
+
+
+- name: tune kernel parameters for cgpro
+  when: allow_sysctl | bool == true
+  sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+    sysctl_file: /etc/sysctl.d/77-cgpro.conf
+  with_dict: "{{ cgpro_sysctl }}"
+  loop_control:
+    label: "{{ item.key }}"
+  tags: cgpro_sysctl
+...

@@ -1,0 +1,51 @@
+---
+- name: restart cgpro service after resetting base directory
+  # cgpro could have shutdown itself due to no postmaster password
+  systemd:
+    name: cgpro
+    state: restarted
+
+- name: wait for cgpro service start
+  wait_for:
+    port: "{{ cgpro_curl_port }}"
+
+- name: set cgpro postmaster password after reset (and agree with license)
+  no_log: "{{ hide_secrets }}"
+  uri:
+    url: &url_mainadmin "{{ cgpro_curl_url }}/MainAdmin/"
+    headers:
+      Referer: *url_mainadmin
+    method: POST
+    body_format: form-urlencoded
+    body:
+      FormCharset: utf-8
+      Agreed: "I Agree"   # "I%20Agree"
+      password: "{{ cgpro_postmaster_password }}"
+      verifyPassword: "{{ cgpro_postmaster_password }}"
+    status_code:
+      - 301   # Moved Permanently is returned first time
+      - 200   # OK is returned when we debug and repeat the steps
+    return_content: no
+
+- name: set cgpro quickstart parameters (main domain, time zone, language)
+  uri:
+    url: &url_quickstart
+      "{{ cgpro_curl_url }}/Quickstart.html?Language=&Charset=utf-8"
+    headers:
+      Referer: *url_quickstart
+    user: postmaster
+    password: "{{ cgpro_postmaster_password }}"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      FormCharset: utf-8
+      Update: Update
+      DomainName: "{{ cgpro_main_domain }}"
+      defaultLanguage: ""
+      defaultCharset: utf-8
+      defaultTimeZone: HostOS
+      ExpertLevel: 10  # Expert
+    follow_redirects: all
+    return_content: no
+
+...

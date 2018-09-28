@@ -1,0 +1,30 @@
+---
+- name: stop cgpro service before restoring from backup
+  systemd:
+    name: cgpro
+    state: stopped
+  notify: restart cgpro service
+
+- name: restore cgpro data from backup archives
+  include_role:
+    name: ivansible.backup_base
+    tasks_from: unarchive_encrypted.yml
+  vars:
+    backup_url: "{{ item }}"
+    dest: "{{ cgpro_dir }}"
+    owner: root
+    group: mail
+  loop: "{{ cgpro_restore_urls.split(',')
+            if cgpro_restore_urls is string
+            else cgpro_restore_urls }}"
+
+- name: start cgpro service after restoring from backup
+  systemd:
+    name: cgpro
+    state: started
+    enabled: yes
+
+- name: wait for cgpro service start
+  wait_for:
+    port: "{{ cgpro_curl_port }}"
+...

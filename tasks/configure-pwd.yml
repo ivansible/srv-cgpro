@@ -1,0 +1,74 @@
+---
+# Reconfiguring cgpro via PWD protocol is obsolete
+# You should use HTTP method from configure.yml
+
+- block:
+    - name: enable clear-text PWD login for postmaster
+      uri:
+        url: &url_account1
+          "{{ cgpro_curl_url }}/Domains/AccountSettings.html?domainName={{ cgpro_main_domain }}&accountName=postmaster"
+        headers:
+          Referer: *url_account1
+        user: postmaster
+        password: "{{ cgpro_postmaster_password }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          Update: Update
+          # SecureOnly: Default=-1 No=0 Yes=1 RequireTLS=2
+          RequireAPOP: 0
+        follow_redirects: all
+        return_content: no
+
+    - name: set cgpro internal ports and aliases of main domain via PWD
+      # Accessing cgpro via PWD protocol requires cleartext password.
+      no_log: "{{ hide_secrets }}"
+      shell:
+        # Without `cmd` argument (undocumented), ansible would render non-first
+        # lines with leading spaces, and shell would miss the __EOF__ marker.
+        # See: https://stackoverflow.com/a/40230416/3279769
+        #      https://github.com/ansible/ansible/issues/12034
+        cmd: |
+          nc -C -w5 localhost 106 <<__EOF__
+          User postmaster
+          Pass {{ cgpro_postmaster_password }}
+          UpdateModule SIP { UDPListener = { Ports = ({ PortNumber = {{ cgpro_port_sip }}; }); }; }
+          UpdateModule SIP { Listener = { Ports = ({ PortNumber = {{ cgpro_port_sip }}; }, { InitialSecurity = on; PortNumber = {{ cgpro_port_sip_ssl }};}); }; }
+          UpdateModule LDAP { Listener = { Ports =  ({ PortNumber = {{ cgpro_port_ldap }};}, { InitialSecurity = on; PortNumber = {{ cgpro_port_ldap_ssl }};}); }; }
+          SetDomainAliases {{ cgpro_main_domain }} ({{ cgpro_domains[1:] | join(', ') }})
+          Quit
+          __EOF__
+      register: netcat_result
+      failed_when:
+        netcat_result.stdout !=
+        netcat_result.stdout | regex_replace('(failed|Invalid|incorrect)')
+      when: cgpro_port_ldap is defined
+            and cgpro_port_ldap_ssl is defined
+            and cgpro_port_sip is defined
+            and cgpro_port_sip_ssl is defined
+      changed_when: true
+      notify:
+        - disable clear-text PWD login for postmaster (restore security)
+        - restart cgpro service
+
+    - name: disable clear-text PWD login for postmaster (restore security)
+      uri:
+        url: &url_account2
+          "{{ cgpro_curl_url }}/Domains/AccountSettings.html?domainName={{ cgpro_main_domain }}&accountName=postmaster"
+        headers:
+          Referer: *url_account2
+        user: postmaster
+        password: "{{ cgpro_postmaster_password }}"
+        method: POST
+        body_format: form-urlencoded
+        body:
+          Update: Update
+          # SecureOnly: Default=-1 No=0 Yes=1 RequireTLS=2
+          RequireAPOP: 1
+        follow_redirects: all
+        return_content: no
+
+  # end of block
+  tags: cgpro_configure_pwd
+
+...
