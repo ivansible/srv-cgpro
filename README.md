@@ -6,14 +6,14 @@ This play can purge the data directory and force initial setup depending on
 the `cgpro_reset` flag, which is normally `false` when running over already
 deployed cgpro. Force it from command line:
 
-    ./scripts/run-role.sh .srv-cgpro cgpro-hostname -e cgpro_reset=yes
+    ./scripts/role.sh .srv-cgpro cgpro-hostname -e cgpro_reset=yes
 
 By default this role either performs a vanilla cgpro setup or (when running over
 already install cgpro) only tweaks a few critical settings without changing
 a whole lot. If you want to restore all settings (and probably mails) from backup,
 force it from command line:
 
-    ./scripts/run-role.sh .srv-cgpro cgpro-hostname -e cgpro_restore=yes
+    ./scripts/role.sh .srv-cgpro cgpro-hostname -e cgpro_restore=yes
 
 
 ## Requirements
