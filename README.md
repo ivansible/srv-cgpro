@@ -113,7 +113,7 @@ Normally you only need to change ports only if you have another daemon
 that uses them, like OpenLDAP or Asterisk.
 
     cgpro_open_ports: ...
-Normally only SMTP and IMAP-SSL ports are open in ubuntu firwall.
+Normally only SMTP and IMAP-SSL ports are open in ubuntu firewall.
 
     cgpro_deb_url: https://communigate.com/...-Linux_6.2-7_amd64.deb
 Location of the CGpro Ubuntu x86-64 debian package.

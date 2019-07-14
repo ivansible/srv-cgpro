@@ -22,12 +22,12 @@
     src: cgpro-mail.nginx.conf
     dest: "{{ nginx_site_dir }}/cgpro-mail.conf"
     lstrip_blocks: yes
-  notify: restart nginx service
+  notify: reload nginx service
 
 - name: configure cgpro admin site for nginx
   template:
     src: cgpro-admin.nginx.conf
     dest: "{{ nginx_site_dir }}/cgpro-admin.conf"
     lstrip_blocks: yes
-  notify: restart nginx service
+  notify: reload nginx service
 ...

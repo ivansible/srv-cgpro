@@ -57,6 +57,12 @@
     mode: 0750
   register: upload_script_result
 
+- name: directory for letsencrypt post-renewal hooks
+  file:
+    path: /etc/letsencrypt/renewal-hooks/post
+    state: directory
+  when: "'/letsencrypt/' in cgpro_ssl_cert"
+
 - name: link a letsencrypt post-renewal hook for cgpro
   file:
     state: link
