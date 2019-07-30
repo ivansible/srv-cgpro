@@ -91,6 +91,7 @@
     rule: allow
     port: "{{ item }}"
     proto: tcp
+  no_log: true
   loop: "{{ cgpro_open_ports }}"
   tags: cgpro_ports
 
