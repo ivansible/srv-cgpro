@@ -10,7 +10,7 @@
   # Prefer include (vs import) to avoid lots of skip messages.
   include_role:
     name: ivansible.lin_nginx
-  when: check_nginx_site_dir.stat.exists == false
+  when: not check_nginx_site_dir.stat.exists
 
 - name: deploy custom cgpro favicon
   get_url:

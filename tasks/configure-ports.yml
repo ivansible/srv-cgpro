@@ -14,7 +14,7 @@
     body_format: form-urlencoded
     body:
       Update: Update
-      Ports: [ 0, 1 ]
+      Ports: [0, 1]
       # Port 0 (SMTP TCP)
       p0: "{{ cgpro_port_smtp }}"
       a0: "[0.0.0.0]"
@@ -45,7 +45,7 @@
     body_format: form-urlencoded
     body:
       Update: Update
-      Ports: [ 0, 1 ]
+      Ports: [0, 1]
       # Port 0 (IMAP TCP)
       p0: "{{ cgpro_port_imap }}"
       a0: "[0.0.0.0]"
@@ -76,7 +76,7 @@
     body_format: form-urlencoded
     body:
       Update: Update
-      Ports: [ 0, 1 ]
+      Ports: [0, 1]
       # Port 0 (LDAP TCP)
       p0: "{{ cgpro_port_ldap }}"
       a0: "[0.0.0.0]"
@@ -106,7 +106,7 @@
     body_format: form-urlencoded
     body:
       Update: Update
-      Ports: [ 0, 1 ]
+      Ports: [0, 1]
       # Port 0 (SIP TCP)
       p0: "{{ cgpro_port_sip }}"
       a0: "[0.0.0.0]"

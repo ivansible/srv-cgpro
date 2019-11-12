@@ -17,11 +17,12 @@
   register: usr_bin_mail_check
 
 - name: backup stock /usr/bin/mail
-  when: usr_bin_mail_check.stat.exists == true
+  when: usr_bin_mail_check.stat.exists
   # use readlink + hardlink to preserve node type
   shell:
-    ln $(readlink -f /usr/bin/mail) /usr/bin/mail.stock
+    ln $(readlink -f /usr/bin/mail) /usr/bin/mail.stock  # noqa 302
   args:
+    warn: false
     creates: /usr/bin/mail.stock
 
 - name: setup cgpro alternative for /usr/bin/mail
@@ -50,8 +51,8 @@
   register: usr_sbin_sendmail_check
 
 - name: backup stock /usr/sbin/sendmail (if it exists and not a symbolic link)
-  when: usr_sbin_sendmail_check.stat.exists == true
-        and usr_sbin_sendmail_check.stat.isreg == true
+  when: usr_sbin_sendmail_check.stat.exists
+        and usr_sbin_sendmail_check.stat.isreg
   command:
     mv /usr/sbin/sendmail /usr/sbin/sendmail.stock
   args:

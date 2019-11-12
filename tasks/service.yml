@@ -8,7 +8,7 @@
   failed_when:
     # do not fail if postfix service cannot be found
     postfix_result.failed is defined
-    and postfix_result.failed == true
+    and postfix_result.failed
     and postfix_result.msg.find('not find the requested service') == -1
 
 - name: disable and completely mask sysv-style cgpro service in /etc/init.d

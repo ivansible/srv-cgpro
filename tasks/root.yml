@@ -9,7 +9,7 @@
       file:
         path: "{{ cgpro_dir }}"
         state: absent
-      when: cgpro_reset | bool == true
+      when: cgpro_reset |bool
 
     - name: check that cgpro base directory exists (appear changed if not)
       # note: this check must go before the first service run
@@ -17,7 +17,7 @@
       stat:
         path: "{{ cgpro_dir }}"
       register: cgpro_dir_check
-      changed_when: cgpro_dir_check.stat.exists == false
+      changed_when: not cgpro_dir_check.stat.exists
       notify: restart cgpro service
 
     - name: create or recreate cgpro base directory and set permissions
@@ -33,9 +33,9 @@
 # CommunigatePro debian package forgets to create symbolic links
 - name: fix symbolic links for mail and sendmail in /usr/bin
   import_tasks: alternatives.yml
-  when: cgpro_dpkg_check | default({}) is changed
-        or cgpro_dir_check | default({}) is changed
-        or cgpro_reset | bool == true
+  when: cgpro_dpkg_check |default({}) is changed
+        or cgpro_dir_check |default({}) is changed
+        or cgpro_reset |bool
   tags: cgpro_alternatives
 
 - name: setup and enable cgpro service
@@ -45,7 +45,7 @@
 
 - name: first time setup of a new cgpro deployment
   import_tasks: first-run.yml
-  when: cgpro_dir_check | default({}) is changed
+  when: cgpro_dir_check |default({}) is changed
   tags:
     - cgpro_firstrun
     - cgpro_configure
@@ -53,7 +53,7 @@
 
 - name: restore cgpro from backup
   import_tasks: restore.yml
-  when: cgpro_restore | bool == true
+  when: cgpro_restore |bool
   tags: cgpro_restore
 
 - name: create a script for making more cgpro backups
@@ -65,7 +65,6 @@
     group: root
     mode: 0750
   tags: cgpro_restore
-
 
 
 - name: configure cgpro settings (http method)
@@ -111,5 +110,4 @@
 - name: integrate cgpro with nginx
   import_tasks: nginx.yml
   tags: cgpro_nginx
-
 ...

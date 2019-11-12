@@ -21,14 +21,17 @@
       register: bin_mail_check
 
     - name: backup stock /bin/mail (cgpro installer overrides it)
-      when: bin_mail_check.stat.exists == true
+      when: bin_mail_check.stat.exists
+      # using readlink + hardlink to preserve node type
       shell:
-        ln $(readlink -f /bin/mail) /bin/mail.stock
+        ln $(readlink -f /bin/mail) /bin/mail.stock  # noqa 302
       args:
+        warn: false
         creates: /bin/mail.stock
+      tags: skip_ansible_lint
 
     - name: leave mark that stock /bin/mail did not exist
-      when: bin_mail_check.stat.exists == false
+      when: not bin_mail_check.stat.exists
       copy:
         dest: /bin/mail.stock
         content: |
@@ -47,14 +50,14 @@
 
 - name: install cgpro package from url
   when: cgpro_dpkg_check is changed
-        or cgpro_reset | bool == true
+        or cgpro_reset |bool
   apt:
     deb: "{{ cgpro_deb_url }}"
-    only_upgrade: "{{ cgpro_reset | bool == false }}"
+    only_upgrade: "{{ not cgpro_reset |bool }}"
 
 
 - name: tune kernel parameters for cgpro
-  when: allow_sysctl | bool == true
+  when: allow_sysctl |bool
   sysctl:
     name: "{{ item.key }}"
     value: "{{ item.value }}"

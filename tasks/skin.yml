@@ -13,7 +13,7 @@
   when:
     skin.check_file is defined and skin.md5sum is defined
   changed_when:
-    checksum_result.stat.exists == false
+    not checksum_result.stat.exists
     or checksum_result.stat.checksum != skin.md5sum
   tags: cgpro_skin
 
@@ -98,6 +98,8 @@
           --form SubSkin="{{ skin.name }}"
           --form Create="Upload File"
           --form Upload="@{{ temp_skin_dir.path }}/{{ skin.name }}.tar"
+      args:
+        warn: false
       register: curl_result
       failed_when: curl_result.stdout != '200'
 

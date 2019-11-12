@@ -22,9 +22,9 @@ cgpro_ssl_key: "{{ nginx_ssl_key }}"
 cgpro_force_ssl: yes
 
 cgpro_trusted_cacerts: []
-  #- name: Let's Encrypt Authority X3
-  #  serial: 0A0141420000015385736A0B85ECA708
-  #  file: letsencrypt-x3.cross-signed.pem
+# - name: Let's Encrypt Authority X3
+#   serial: 0A0141420000015385736A0B85ECA708
+#   file: letsencrypt-x3.cross-signed.pem
 
 
 # Please change the default. If you are restoring from a backup,
@@ -68,9 +68,9 @@ cgpro_restore_urls: []
 
 cgpro_skins:
   - name: Example Skin
-    #url: https://example.com/download/skins/example.tar.zip?param=test
-    #check_file: version
-    #md5sum: 1a2b3c4d5e6f708192a3b4c5d6e7f80e
+  # url: https://example.com/download/skins/example.tar.zip?param=test
+  # check_file: version
+  # md5sum: 1a2b3c4d5e6f708192a3b4c5d6e7f80e
 
 
 cgpro_sysctl:

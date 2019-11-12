@@ -1,6 +1,0 @@
----
-- hosts: localhost
-  remote_user: username
-  roles:
-    - ivansible.srv_cgpro
-...

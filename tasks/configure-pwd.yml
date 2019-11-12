@@ -33,11 +33,15 @@
           User postmaster
           Pass {{ cgpro_postmaster_password }}
           UpdateModule SIP { UDPListener = { Ports = ({ PortNumber = {{ cgpro_port_sip }}; }); }; }
-          UpdateModule SIP { Listener = { Ports = ({ PortNumber = {{ cgpro_port_sip }}; }, { InitialSecurity = on; PortNumber = {{ cgpro_port_sip_ssl }};}); }; }
-          UpdateModule LDAP { Listener = { Ports =  ({ PortNumber = {{ cgpro_port_ldap }};}, { InitialSecurity = on; PortNumber = {{ cgpro_port_ldap_ssl }};}); }; }
-          SetDomainAliases {{ cgpro_main_domain }} ({{ cgpro_domains[1:] | join(', ') }})
+          UpdateModule SIP { Listener = { Ports = ({ PortNumber = {{ cgpro_port_sip }}; }, { {{ sip_ssl_stanza }} }); }; }
+          UpdateModule LDAP { Listener = { Ports =  ({ PortNumber = {{ cgpro_port_ldap }};}, { {{ ldap_ssl_stanza }} }); }; }
+          SetDomainAliases {{ cgpro_main_domain }} ({{ domain_alias_list }})
           Quit
           __EOF__
+      vars:
+        sip_ssl_stanza: "InitialSecurity = on; PortNumber = {{ cgpro_port_sip_ssl }};"
+        ldap_ssl_stanza: "InitialSecurity = on; PortNumber = {{ cgpro_port_ldap_ssl }};"
+        domain_alias_list: "{{ cgpro_domains[1:] | join(', ')  }}"
       register: netcat_result
       failed_when:
         netcat_result.stdout !=
