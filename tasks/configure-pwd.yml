@@ -22,7 +22,7 @@
 
     - name: set cgpro internal ports and aliases of main domain via PWD
       # Accessing cgpro via PWD protocol requires cleartext password.
-      no_log: "{{ hide_secrets }}"
+      no_log: "{{ hide_secrets |bool }}"
       shell:
         # Without `cmd` argument (undocumented), ansible would render non-first
         # lines with leading spaces, and shell would miss the __EOF__ marker.

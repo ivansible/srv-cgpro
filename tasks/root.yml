@@ -92,6 +92,7 @@
     proto: tcp
   no_log: true
   loop: "{{ cgpro_open_ports }}"
+  when: lin_use_firewall |bool
   tags: cgpro_ports
 
 - name: set server ssl certificate in cgpro

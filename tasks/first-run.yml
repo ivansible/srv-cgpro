@@ -10,7 +10,7 @@
     port: "{{ cgpro_curl_port }}"
 
 - name: set cgpro postmaster password after reset (and agree with license)
-  no_log: "{{ hide_secrets }}"
+  no_log: "{{ hide_secrets |bool }}"
   uri:
     url: &url_mainadmin "{{ cgpro_curl_url }}/MainAdmin/"
     headers:
