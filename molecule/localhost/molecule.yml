@@ -1,0 +1,55 @@
+---
+dependency:
+  name: galaxy
+  options:
+    role-file: molecule/default/requirements.yml
+driver:
+  name: delegated
+  options:
+    managed: false
+    ansible_connection_options:
+      ansible_connection: local
+platforms:
+  - name: localhost
+    groups:
+      - molecule
+provisioner:
+  name: ansible
+  inventory:
+    group_vars:
+      molecule:
+        linbase_system_locale: en_US.UTF-8
+        lin_use_ssh: ${IVATEST_SSH_SERVER:-true}
+        lin_systemd_tmpfiles: ${IVATEST_SYSTEMD_TMPFILES:-true}
+        # these pass on host:
+        lin_use_firewall: ${IVATEST_FIREWALL:-true}
+        linbase_time_sync: true
+        allow_sysctl: true
+        # settings:
+        cgpro_deb_url: https://dropbox.com/s/u4s7d3p7jnquvdx/CGatePro-Linux_6.2-7_amd64.deb?dl=1
+  playbooks:
+    prepare: ../default/prepare.yml
+    converge: ../default/playbook.yml
+    verify: ../default/verify.yml
+  lint:
+    name: ansible-lint
+verifier:
+  name: ansible
+  lint:
+    name: ansible-lint
+    enabled: false
+lint:
+  name: yamllint
+  options:
+    config-file: .yamllint.yml
+scenario:
+  name: localhost
+  test_sequence:
+    - lint
+    - dependency
+    - syntax
+    - prepare
+    - converge
+    - idempotence
+    - verify
+...

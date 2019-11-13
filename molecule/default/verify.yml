@@ -1,0 +1,51 @@
+---
+- name: verify
+  hosts: all
+  tasks:
+    - name: assert that cgpro service is started and enabled
+      service_facts:
+    - assert:
+        that: ansible_facts.services['cgpro.service'].state == 'running'
+    - assert:
+        that: ansible_facts.services['cgpro.service'].status == 'enabled'
+
+    - name: assert that mail site works
+      command: >
+        curl -ksL https://{{ host }}
+          --resolve {{ host }}:443:{{ addr }}
+          --resolve {{ host }}:80:{{ addr }}
+      vars:
+        host: mail.example.com
+        addr: 127.0.0.1
+      args:
+        warn: false
+      changed_when: false
+      register: html_mail
+    - assert:
+        that: "'Welcome to CommuniGate Pro,' in html_mail.stdout"
+
+    - name: assert that admin site works
+      command: >
+        curl -ksL https://{{ host }}
+          --resolve {{ host }}:443:{{ addr }}
+          --resolve {{ host }}:80:{{ addr }}
+      vars:
+        host: cgpro.example.com
+        addr: 127.0.0.1
+      args:
+        warn: false
+      changed_when: false
+      register: html_admin
+    - assert:
+        that: "'Welcome to CommuniGate Pro Server Administration.' in html_admin.stdout"
+
+    - name: assert that smtp port answers
+      shell: nc -v -w1 localhost 25
+      args:
+        stdin: ""
+        warn: false
+      changed_when: false
+      register: reply_smtp
+    - assert:
+        that: "'ESMTP CommuniGate Pro' in reply_smtp.stdout"
+...

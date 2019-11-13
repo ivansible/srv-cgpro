@@ -1,0 +1,15 @@
+---
+- name: prepare
+  hosts: all
+  roles:
+    - role: ivansible.lin_system
+    - role: ivansible.lin_nginx
+  tasks:
+    - name: stop exim from taking port 25 on github runners
+      systemd:
+        name: exim4
+        state: stopped
+        masked: true
+      become: true
+      ignore_errors: true
+...
