@@ -1,8 +1,4 @@
 ---
-- name: refresh facts as non root
-  setup:
-  become: no
-
 - name: installation overview
   debug:
     msg:
@@ -12,10 +8,9 @@
       - "restore: {{ cgpro_restore }}"
   tags: cgpro_all
 
-# use import to become root globally
-- name: become root
+- name: perform cgpro tasks as root
   import_tasks: root.yml
-  become: yes
+  become: true
   tags: cgpro_all
 
 - meta: flush_handlers
