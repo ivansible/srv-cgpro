@@ -4,7 +4,7 @@ dependency:
 driver:
   name: docker
 platforms:
-  - name: molecule1604
+  - name: xenial
     image: ivandeex/molecule:16.04
     command: ""
     volumes:
@@ -13,7 +13,7 @@ platforms:
     pre_build_image: true
     groups:
       - molecule
-  - name: molecule1804
+  - name: bionic
     image: ivandeex/molecule:18.04
     command: ""
     volumes:
@@ -29,12 +29,12 @@ provisioner:
       molecule:
         ansible_user: ansible
         linbase_system_locale: en_US.UTF-8
+        allow_sysctl: false
         lin_use_ssh: ${IVATEST_SSH_SERVER:-true}
         lin_systemd_tmpfiles: ${IVATEST_SYSTEMD_TMPFILES:-true}
         # these will fail in docker:
         lin_use_firewall: ${IVATEST_FIREWALL:-true}
         linbase_time_sync: false
-        allow_sysctl: false
         # settings:
         cgpro_deb_url: https://dropbox.com/s/u4s7d3p7jnquvdx/CGatePro-Linux_6.2-7_amd64.deb?dl=1
   lint:
