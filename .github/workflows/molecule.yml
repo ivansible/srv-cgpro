@@ -46,8 +46,9 @@ jobs:
 
       - name: Run test
         shell: bash
-        run: |
-          molecule test -s $SCENARIO
+        run: cd ivansible/$ROLE_NAME && molecule test -s $SCENARIO
+        # disable direct test on github runner with open ports 25/80/443
+        if: false
 
   docker_test:
     name: tests in docker
@@ -78,6 +79,5 @@ jobs:
 
       - name: Run test
         shell: bash
-        run: |
-          molecule test -s $SCENARIO
+        run: cd ivansible/$ROLE_NAME && molecule test -s $SCENARIO
 ...
