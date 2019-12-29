@@ -3,7 +3,7 @@
   systemd:
     name: postfix
     state: stopped
-    enabled: no
+    enabled: false
   register: postfix_result
   failed_when:
     # do not fail if postfix service cannot be found
@@ -15,9 +15,9 @@
   systemd:
     name: CommuniGate.service
     state: stopped
-    enabled: no
-    masked: yes
-    daemon_reload: yes  # detect init.d service
+    enabled: false
+    masked: true
+    daemon_reload: true  # detect init.d service
   changed_when: false
   failed_when: false
 
@@ -44,6 +44,6 @@
   systemd:
     name: cgpro
     state: started
-    enabled: yes
-    daemon_reload: yes
+    enabled: true
+    daemon_reload: true
 ...

@@ -1,8 +1,9 @@
 ---
-# defaults file for ivansible.srv_cgpro
+# defaults for ivansible.srv_cgpro
+# yamllint disable rule:comments
 
-cgpro_reset: no
-cgpro_restore: no
+cgpro_reset: false
+cgpro_restore: false
 
 
 cgpro_domains:
@@ -19,7 +20,7 @@ cgpro_admin_site: "cgpro.{{ web_domain }}"
 
 cgpro_ssl_cert: "{{ nginx_ssl_cert }}"
 cgpro_ssl_key: "{{ nginx_ssl_key }}"
-cgpro_force_ssl: yes
+cgpro_force_ssl: true
 
 cgpro_trusted_cacerts: []
 # - name: Let's Encrypt Authority X3

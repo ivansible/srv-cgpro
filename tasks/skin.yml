@@ -6,9 +6,9 @@
 - name: check md5 sum of the {{ skin.name }} skin check file
   stat:
     path: "{{ cgpro_dir }}/Accounts/WebSkins/{{ skin.name }}/{{ skin.check_file }}"
-    get_checksum: yes
+    get_checksum: true
     checksum_algorithm: md5
-  become: yes
+  become: true
   register: checksum_result
   when:
     skin.check_file is defined and skin.md5sum is defined
@@ -26,7 +26,7 @@
         user: postmaster
         password: "{{ cgpro_postmaster_password }}"
         method: GET
-        return_content: yes
+        return_content: true
       register: webskins_page
 
     - name: create custom unnamed skin (cgpro requires it before creating named skins)
@@ -41,7 +41,7 @@
         body:
           CreateDefault: "Create Custom Unnamed Skin"
         follow_redirects: all
-        return_content: no
+        return_content: false
       when: webskins_page.content.find('value="Create Custom Unnamed Skin"') != -1
 
     - name: create skin {{ skin.name }} in cgpro (it's empty unless tarball is uploaded)
@@ -58,7 +58,7 @@
           CreateSkin: Create
           NewName: "{{ skin.name }}"
         follow_redirects: all
-        return_content: no
+        return_content: false
       when:
         (webskins_page.content |
          regex_search('<td><a href=\"[^\"]+\">%s</a></td>' % skin.name)
@@ -75,7 +75,7 @@
     - name: unarchive cgpro skin to the temporary directory
       unarchive:
         src: "{{ skin.url }}"
-        remote_src: yes
+        remote_src: true
         dest: "{{ temp_skin_dir.path }}"
 
     - name: verify that skin tarball file exists
@@ -123,7 +123,7 @@
           SubSkin: "{{ skin.name }}"
           Flush: Uncache
         follow_redirects: all
-        return_content: no
+        return_content: false
       changed_when: true
       notify: restart cgpro service
 

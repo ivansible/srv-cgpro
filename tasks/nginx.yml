@@ -2,7 +2,7 @@
 - name: check that role lin_nginx is deployed
   stat:
     path: "{{ nginx_def_site_dir }}/favicon.ico"
-    get_checksum: no
+    get_checksum: false
   register: check_nginx_site_dir
 
 - name: deploy role lin_nginx
@@ -21,13 +21,13 @@
   template:
     src: cgpro-mail.nginx.conf
     dest: "{{ nginx_site_dir }}/cgpro-mail.conf"
-    lstrip_blocks: yes
+    lstrip_blocks: true
   notify: reload nginx service
 
 - name: configure cgpro admin site for nginx
   template:
     src: cgpro-admin.nginx.conf
     dest: "{{ nginx_site_dir }}/cgpro-admin.conf"
-    lstrip_blocks: yes
+    lstrip_blocks: true
   notify: reload nginx service
 ...

@@ -17,7 +17,7 @@
     - name: check that /bin/mail exists
       stat:
         path: /bin/mail
-        get_checksum: no
+        get_checksum: false
       register: bin_mail_check
 
     - name: backup stock /bin/mail (cgpro installer overrides it)
@@ -38,7 +38,7 @@
           #!/bin/sh
           echo "$0 did not exist" 1>&2
         mode: 0755
-        force: no
+        force: false
   tags: cgpro_alternatives
 
 
@@ -46,7 +46,7 @@
   # this check tries to save on the .deb download time
   command: dpkg --get-selections cgatepro-linux
   register: cgpro_dpkg_check
-  changed_when: cgpro_dpkg_check.stdout == ""
+  changed_when: cgpro_dpkg_check.stdout == ''  # noqa 602
 
 - name: install cgpro package from url
   when: cgpro_dpkg_check is changed

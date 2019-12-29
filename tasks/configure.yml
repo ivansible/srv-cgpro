@@ -16,7 +16,7 @@
       AdminSkinName: Admin-dash
       DisplayCharset: utf-8
     follow_redirects: all
-    return_content: no
+    return_content: false
 
 - name: configure cgpro master and enabling keys
   uri:
@@ -33,9 +33,9 @@
       Master: "{{ cgpro_master_key }}"
       LicenseKeys: "{{ cgpro_enabling_keys }}"
     follow_redirects: all
-    return_content: no
+    return_content: false
   when: cgpro_master_key is defined
-        and cgpro_master_key != ''
+        and cgpro_master_key != ''  # noqa 602
 
 - name: update main domain in general cgpro settings
   # note: domain name from license will override this setting
@@ -55,7 +55,7 @@
       CrashRecovery: 1  # Enabled
       SeparateAdminRealms: 0  # No
     follow_redirects: all
-    return_content: no
+    return_content: false
 
 - name: set aliases of main cgpro domain
   uri:
@@ -72,6 +72,6 @@
       Update: Update
       AliasName: "{{ cgpro_domains[1:] }}"
     follow_redirects: all
-    return_content: no
-  when: cgpro_domains | length > 1
+    return_content: false
+  when: cgpro_domains |length > 1
 ...

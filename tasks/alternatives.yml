@@ -13,7 +13,7 @@
 - name: check that /usr/bin/mail exists
   stat:
     path: /usr/bin/mail
-    get_checksum: no
+    get_checksum: false
   register: usr_bin_mail_check
 
 - name: backup stock /usr/bin/mail
@@ -47,7 +47,7 @@
 - name: check that /usr/sbin/sendmail exists and is a regular file
   stat:
     path: /usr/sbin/sendmail
-    get_checksum: no
+    get_checksum: false
   register: usr_sbin_sendmail_check
 
 - name: backup stock /usr/sbin/sendmail (if it exists and not a symbolic link)

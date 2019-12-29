@@ -22,7 +22,7 @@
   systemd:
     name: cgpro
     state: started
-    enabled: yes
+    enabled: true
 
 - name: wait for cgpro service start
   wait_for:

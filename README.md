@@ -10,14 +10,14 @@ This play can purge the data directory and force initial setup depending on
 the `cgpro_reset` flag, which is normally `false` when running over already
 deployed cgpro. Force it from command line:
 
-    ./scripts/role.sh .srv-cgpro cgpro-hostname -e cgpro_reset=yes
+    ivantory-role .srv-cgpro cgpro-hostname -e cgpro_reset=true
 
 By default this role either performs a vanilla cgpro setup or (when running over
 already install cgpro) only tweaks a few critical settings without changing
 a whole lot. If you want to restore all settings (and probably mails) from backup,
 force it from command line:
 
-    ./scripts/role.sh .srv-cgpro cgpro-hostname -e cgpro_restore=yes
+    ivantory-role .srv-cgpro cgpro-hostname -e cgpro_restore=true
 
 
 ## Requirements
@@ -29,8 +29,8 @@ None
 
 Available variables are listed below, along with default values.
 
-    cgpro_reset: no
-    cgpro_restore: no
+    cgpro_reset: false
+    cgpro_restore: false
 These switches can be only activated from ansible cli.
 
     cgpro_domains:
@@ -46,7 +46,7 @@ The `mail_domain` setting is imported from the `nginx_base` role.
     cgpro_admin_site: "cgpro.{{ web_domain }}"
 The `web_domain` setting is imported from the `nginx_base` role.
 
-    cgpro_force_ssl: yes
+    cgpro_force_ssl: true
 By default nginx sites for cgpro always redirect to _https_.
 
     cgpro_ssl_cert: "{{ nginx_ssl_cert }}"
@@ -79,7 +79,7 @@ the password matches archived settings (else installation will fail).
 License keys. Master key must correspond to the main domain.
 
     cgpro_restore_urls: []
-The list of backup archives is required only if `cgpro_restore` is `yes`.
+The list of backup archives is required only if `cgpro_restore` is `true`.
 This can be set in inventory as a list of urls
 or on ansible command line as a string of urls concatenated by comma.
 
@@ -137,7 +137,7 @@ Custom favicon for webmail.
                     (e.g. maximum number of threads per process
                      or size of a socket listen backlog)
 - `cgpro_alternatives` -- create symbolic links for `mail` and `sendmail`
-- `cgpro_dir` -- if `cgpro_reset` is `yes`, completely purge cgpro data directory
+- `cgpro_dir` -- if `cgpro_reset` is `true`, completely purge cgpro data directory
 - `cgpro_restore` -- restore cgpro settings and mails from encrypted backup archives
 - `cgpro_service` -- disable `/etc/init.d` cgpro script
                      and enable new-style systemd service `cgpro`
@@ -187,4 +187,4 @@ MIT
 
 ## Author Information
 
-Created in 2018 by [IvanSible](https://github.com/ivansible)
+Created in 2018-2020 by [IvanSible](https://github.com/ivansible)

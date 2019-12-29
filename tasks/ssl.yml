@@ -5,7 +5,7 @@
     user: postmaster
     password: "{{ cgpro_postmaster_password }}"
     method: GET
-    return_content: yes
+    return_content: true
   register: cacerts_page
 
 - name: add new cgpro trusted certificate authorities
@@ -22,13 +22,11 @@
       Create: Set Certificate
       Certificate: "{{ lookup('file', item.file) }}"
     follow_redirects: all
-    return_content: no
-  when:
-    cacerts_page.content.find(
-      '<tt>%s</tt>' % item.serial
-      if item.serial != '' else
-      '<td>%s</td>' % item.name
-    ) == -1
+    return_content: false
+  when: cacerts_page.content.find(needle) == -1
+  vars:
+    has_serial: "{{ item.serial |default('') != '' }}"  # noqa 602
+    needle: "{{ '<tt>%s</tt>' % item.serial if has_serial else '<td>%s</td>' % item.name }}"
   loop: "{{ cgpro_trusted_cacerts }}"
   loop_control:
     label: "{{ item.name }}"
