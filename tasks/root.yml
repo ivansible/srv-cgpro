@@ -85,15 +85,27 @@
     - cgpro_configure
     - cgpro_ports
 
-- name: open cgpro ports in ubuntu firewall
+- name: open cgpro ports in ufw
   ufw:
     rule: allow
-    port: "{{ item }}"
+    port: "{{ item |string }}"
     proto: tcp
-  no_log: true
+  no_log: "{{ hide_secrets |bool }}"
   loop: "{{ cgpro_open_ports }}"
-  when: lin_use_firewall |bool
-  tags: cgpro_ports
+  when: lin_firewall == 'ufw'
+  tags:
+    - cgpro_firewall
+
+- name: open cgpro ports in ferm
+  ferm_port:
+    port: "{{ cgpro_open_ports }}"
+    proto: tcp
+    comment: cgpro
+  when: lin_firewall == 'ferm'
+  tags:
+    - skip_ansible_lint
+    - cgpro_firewall
+
 
 - name: set server ssl certificate in cgpro
   import_tasks: ssl.yml

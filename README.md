@@ -148,6 +148,7 @@ Custom favicon for webmail.
                        select modern administration interface skin
 - `cgpro_ports` -- set SIP, LDAP, SMTP and IMAP ports,
                    open ports in ubuntu firewall
+- `cgpro_firewall` -- open CGPro ports in firewall
 - `cgpro_ssl` -- add new cgpro trusted certificate authorities,
                  upload cgpro ssl certificate and private key,
                  if letsencrypt certificate is detected, deploy a letsencrypt hook
@@ -159,7 +160,7 @@ Custom favicon for webmail.
 ## Dependencies
 
 - [ivansible.lin_base](https://github.com/ivansible/lin-base) --
-  for some common settings, e.g. `allow_sysctl`
+  for common modules and settings, e.g. `allow_sysctl`
 - [ivansible.nginx_base](https://github.com/ivansible/nginx-base) --
   for ssl certificate file path and nginx config snippets
 - [ivansible.backup_base](https://github.com/ivansible/backup-base) --

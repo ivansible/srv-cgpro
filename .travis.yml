@@ -26,7 +26,7 @@ matrix:
     - name: test on xenial
       dist: xenial
       env:
-        - IVATEST_FIREWALL=true
+        - IVATEST_FIREWALL=ferm
         - IVATEST_CHECK_HTTPS_HTML=false
       script:
         - molecule test -s localhost
@@ -34,7 +34,7 @@ matrix:
     - name: test on bionic
       dist: bionic
       env:
-        - IVATEST_FIREWALL=true
+        - IVATEST_FIREWALL=ferm
         - IVATEST_CHECK_HTTPS_HTML=false
       script:
         - molecule test -s localhost
@@ -43,7 +43,7 @@ matrix:
       dist: bionic
       services: docker
       env:
-        - IVATEST_FIREWALL=false
+        - IVATEST_FIREWALL=none
         - IVATEST_CHECK_HTTPS_HTML=true
       script:
         - molecule lint
