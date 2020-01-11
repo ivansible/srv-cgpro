@@ -6,6 +6,8 @@
     password: "{{ cgpro_postmaster_password }}"
     method: GET
     return_content: true
+    use_proxy: false
+  environment: {no_proxy: '*'}
   register: cacerts_page
 
 - name: add new cgpro trusted certificate authorities
@@ -23,6 +25,8 @@
       Certificate: "{{ lookup('file', item.file) }}"
     follow_redirects: all
     return_content: false
+    use_proxy: false
+  environment: {no_proxy: '*'}
   when: cacerts_page.content.find(needle) == -1
   vars:
     has_serial: "{{ item.serial |default('') != '' }}"  # noqa 602

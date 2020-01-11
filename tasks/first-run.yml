@@ -26,6 +26,8 @@
       - 301   # Moved Permanently is returned first time
       - 200   # OK is returned when we debug and repeat the steps
     return_content: false
+    use_proxy: false
+  environment: {no_proxy: '*'}
 
 - name: set cgpro quickstart parameters (main domain, time zone, language)
   uri:
@@ -47,4 +49,6 @@
       ExpertLevel: 10  # Expert
     follow_redirects: all
     return_content: false
+    use_proxy: false
+  environment: {no_proxy: '*'}
 ...

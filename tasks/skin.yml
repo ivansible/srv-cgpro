@@ -27,6 +27,8 @@
         password: "{{ cgpro_postmaster_password }}"
         method: GET
         return_content: true
+        use_proxy: false
+      environment: {no_proxy: '*'}
       register: webskins_page
 
     - name: create custom unnamed skin (cgpro requires it before creating named skins)
@@ -42,6 +44,8 @@
           CreateDefault: "Create Custom Unnamed Skin"
         follow_redirects: all
         return_content: false
+        use_proxy: false
+      environment: {no_proxy: '*'}
       when: webskins_page.content.find('value="Create Custom Unnamed Skin"') != -1
 
     - name: create skin {{ skin.name }} in cgpro (it's empty unless tarball is uploaded)
@@ -59,6 +63,8 @@
           NewName: "{{ skin.name }}"
         follow_redirects: all
         return_content: false
+        use_proxy: false
+      environment: {no_proxy: '*'}
       when:
         (webskins_page.content |
          regex_search('<td><a href=\"[^\"]+\">%s</a></td>' % skin.name)
@@ -91,6 +97,7 @@
       command:
         curl
           --url "{{ webskins_page.url }}&SubSkin={{ skin.name }}"
+          --noproxy '*'
           --header "Referer{{':'}} {{ webskins_page.url }}&SubSkin={{ skin.name }}"
           --location --silent --write-out "%{http_code}" --output /dev/null
           --digest --user "postmaster:{{ cgpro_postmaster_password }}" \
@@ -124,6 +131,8 @@
           Flush: Uncache
         follow_redirects: all
         return_content: false
+        use_proxy: false
+      environment: {no_proxy: '*'}
       changed_when: true
       notify: restart cgpro service
 

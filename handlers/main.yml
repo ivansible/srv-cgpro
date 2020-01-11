@@ -5,6 +5,7 @@
   file:
     path: "{{ temp_skin_dir.path }}"
     state: absent
+  become: true
   when: temp_skin_dir is defined
 
 - name: disable clear-text PWD login for postmaster (restore security)

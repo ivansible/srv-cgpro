@@ -22,8 +22,9 @@ ssl_privkey="{{ cgpro_ssl_key }}"
 
 cert_url="http://localhost:${curl_port}/Master/Domains/DomainCertificate.html?domainName=${domain}"
 
-curl_opts="--digest -L -s -w %{http_code} -H Expect:"
+curl_opts="--noproxy localhost --digest -L -s -w %{http_code} -H Expect:"
 # note:
+# --noproxy = direct connection to given host
 # --digest = force digest authentication, because default (basic) method may
 #            result in cgpro error "clear text authentication is prohibited"
 # -L = follow redirects (always want to see status 200, not 301/201)

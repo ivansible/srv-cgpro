@@ -19,6 +19,8 @@
           RequireAPOP: 0
         follow_redirects: all
         return_content: false
+        use_proxy: false
+      environment: {no_proxy: '*'}
 
     - name: set cgpro internal ports and aliases of main domain via PWD
       # Accessing cgpro via PWD protocol requires cleartext password.
@@ -71,6 +73,8 @@
           RequireAPOP: 1
         follow_redirects: all
         return_content: false
+        use_proxy: false
+      environment: {no_proxy: '*'}
 
   # end of block
   tags: cgpro_configure_pwd

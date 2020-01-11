@@ -29,6 +29,8 @@
       d1: ""
     follow_redirects: all
     return_content: false
+    use_proxy: false
+  environment: {no_proxy: '*'}
   when: cgpro_port_smtp is defined
         and cgpro_port_smtp_ssl is defined
 
@@ -60,6 +62,8 @@
       d1: ""
     follow_redirects: all
     return_content: false
+    use_proxy: false
+  environment: {no_proxy: '*'}
   when: cgpro_port_imap is defined
         and cgpro_port_imap_ssl is defined
 
@@ -91,6 +95,8 @@
       d1: ""
     follow_redirects: all
     return_content: false
+    use_proxy: false
+  environment: {no_proxy: '*'}
   when: cgpro_port_ldap is defined
         and cgpro_port_ldap_ssl is defined
 
@@ -121,6 +127,8 @@
       d1: ""
     follow_redirects: all
     return_content: false
+    use_proxy: false
+  environment: {no_proxy: '*'}
   when: cgpro_port_sip is defined
         and cgpro_port_sip_ssl is defined
 
@@ -144,5 +152,7 @@
       d0: ""
     follow_redirects: all
     return_content: false
+    use_proxy: false
+  environment: {no_proxy: '*'}
   when: cgpro_port_sip is defined
 ...
