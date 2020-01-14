@@ -83,6 +83,9 @@
         src: "{{ skin.url }}"
         remote_src: true
         dest: "{{ temp_skin_dir.path }}"
+      # fix intermittent network failures
+      register: download_skin_result
+      until: "'timed out' not in download_skin_result.msg |default('')"
 
     - name: verify that skin tarball file exists
       file:
