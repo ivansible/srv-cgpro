@@ -29,7 +29,7 @@ provisioner:
         cgpro_deb_url: https://dropbox.com/s/u4s7d3p7jnquvdx/CGatePro-Linux_6.2-7_amd64.deb?dl=1
   playbooks:
     prepare: ../default/prepare.yml
-    converge: ../default/playbook.yml
+    converge: ../default/converge.yml
     verify: ../default/verify.yml
   lint:
     name: ansible-lint
@@ -38,10 +38,6 @@ verifier:
   lint:
     name: ansible-lint
     enabled: false
-lint:
-  name: yamllint
-  options:
-    config-file: .yamllint.yml
 scenario:
   name: localhost
   test_sequence:
