@@ -10,7 +10,7 @@
   environment: {no_proxy: '*'}
   register: cacerts_page
 
-- name: add new cgpro trusted certificate authorities
+- name: add new cgpro trusted certificate authorities (skip in check mode)
   uri:
     url: *url_cacerts
     headers:
@@ -27,7 +27,9 @@
     return_content: false
     use_proxy: false
   environment: {no_proxy: '*'}
-  when: cacerts_page.content.find(needle) == -1
+  ## the uri task above is skipped in check mode and produces no connent
+  when: not ansible_check_mode
+        and cacerts_page.content.find(needle) == -1
   vars:
     has_serial: "{{ item.serial |default('') != '' }}"  # noqa 602
     needle: "{{ '<tt>%s</tt>' % item.serial if has_serial else '<td>%s</td>' % item.name }}"
