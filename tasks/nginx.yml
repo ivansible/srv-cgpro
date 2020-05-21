@@ -10,12 +10,16 @@
   # Prefer include (vs import) to avoid lots of skip messages.
   include_role:
     name: ivansible.lin_nginx
+    apply:
+      tags: [cgpro_nginx, cgpro_all]
   when: not check_nginx_site_dir.stat.exists
 
 - name: deploy custom cgpro favicon
   get_url:
     url: "{{ cgpro_favicon_url }}"
     dest: "{{ nginx_def_site_dir }}/favicon-cgpro.ico"
+  register: _cgpro_favicon_result
+  until: _cgpro_favicon_result is successful
 
 - name: configure cgpro webmail for nginx
   template:
