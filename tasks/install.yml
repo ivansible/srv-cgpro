@@ -54,6 +54,9 @@
   apt:
     deb: "{{ cgpro_deb_url }}"
     only_upgrade: "{{ not cgpro_reset |bool }}"
+  ## retry network errors
+  register: apt_url_result
+  until: apt_url_result is successful
 
 
 - name: tune kernel parameters for cgpro
