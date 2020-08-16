@@ -18,6 +18,7 @@
   get_url:
     url: "{{ cgpro_favicon_url }}"
     dest: "{{ nginx_def_site_dir }}/favicon-cgpro.ico"
+    mode: 0644
   register: _cgpro_favicon_result
   until: _cgpro_favicon_result is successful
 
@@ -26,6 +27,7 @@
     src: cgpro-mail.nginx.conf
     dest: "{{ nginx_site_dir }}/cgpro-mail.conf"
     lstrip_blocks: true
+    mode: 0644
   notify: reload nginx service
 
 - name: configure cgpro admin site for nginx
@@ -33,5 +35,6 @@
     src: cgpro-admin.nginx.conf
     dest: "{{ nginx_site_dir }}/cgpro-admin.conf"
     lstrip_blocks: true
+    mode: 0644
   notify: reload nginx service
 ...

@@ -21,7 +21,7 @@
   changed_when: false
   failed_when: false
 
-- name: create new-style systemd service descriptor for cgpro
+- name: create modern systemd service for cgpro
   copy:
     content: |
       # cgpro.service
@@ -39,11 +39,14 @@
       [Install]
       WantedBy=multi-user.target
     dest: /etc/systemd/system/cgpro.service
+    force: true
+    mode: 0644
+  register: _cgpro_systemd_unit
 
 - name: enable cgpro systemd service
   systemd:
     name: cgpro
     state: started
     enabled: true
-    daemon_reload: true
+    daemon_reload: "{{ _cgpro_systemd_unit is changed }}"
 ...
