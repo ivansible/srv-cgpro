@@ -161,6 +161,8 @@ Custom favicon for webmail.
 
 - [ivansible.lin_base](https://github.com/ivansible/lin-base) --
   for common modules and settings, e.g. `allow_sysctl`
+- [ivansible.cert_base](https://github.com/ivansible/cert-base) --
+  for common certbot settings
 - [ivansible.nginx_base](https://github.com/ivansible/nginx-base) --
   for ssl certificate file path and nginx config snippets
 - [ivansible.backup_base](https://github.com/ivansible/backup-base) --

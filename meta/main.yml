@@ -3,6 +3,7 @@ dependencies:
   - ivansible.lin_base       # for common settings and modules
   - ivansible.nginx_base     # for ssl certificate and nginx config snippets
   - ivansible.backup_base    # for unarchive_encrypted.yml
+  - ivansible.cert_base      # for common certbot settings
   # the following roles are imported directly from tasks:
   # - ivansible.lin_nginx
 

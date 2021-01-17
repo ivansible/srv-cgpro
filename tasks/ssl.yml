@@ -49,8 +49,9 @@
 
 - name: create directory for cgpro certificate script
   file:
-    path: "{{ cgpro_cert_update_script | dirname }}"
+    path: "{{ cgpro_cert_update_script |dirname }}"
     state: directory
+    mode: 0755
 
 - name: create a script for uploading certificate to cgpro
   template:
@@ -63,16 +64,17 @@
 
 - name: directory for letsencrypt post-renewal hooks
   file:
-    path: /etc/letsencrypt/renewal-hooks/post
+    path: "{{ certbot_post_dir }}"
     state: directory
-  when: "'/letsencrypt/' in cgpro_ssl_cert"
+    mode: 0755
+  when: cgpro_ssl_cert is search('/letsencrypt/')
 
 - name: link a letsencrypt post-renewal hook for cgpro
   file:
     state: link
     src: "{{ cgpro_cert_update_script }}"
-    dest: /etc/letsencrypt/renewal-hooks/post/cgpro
-  when: "'/letsencrypt/' in cgpro_ssl_cert"
+    dest: "{{ certbot_post_dir }}/cgpro"
+  when: cgpro_ssl_cert is search('/letsencrypt/')
 
 - name: upload certificate and private key to cgpro
   command: "{{ cgpro_cert_update_script }}"
