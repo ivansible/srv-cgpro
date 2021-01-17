@@ -2,6 +2,10 @@
 - name: verify
   hosts: all
   tasks:
+    - name: vars
+      include_vars: vars.yml
+      tags: always
+
     - name: assert that cgpro service is started and enabled
       service_facts:
     - assert:
@@ -22,7 +26,7 @@
       changed_when: false
       register: html_mail
     - assert:
-        that: "'Welcome to CommuniGate Pro,' in html_mail.stdout"
+        that: html_mail.stdout is search('Welcome to CommuniGate Pro,')
 
     - name: assert that admin site works
       command: >
@@ -37,7 +41,7 @@
       changed_when: false
       register: html_admin
     - assert:
-        that: "'Welcome to CommuniGate Pro Server Administration.' in html_admin.stdout"
+        that: html_admin.stdout is search('Welcome to CommuniGate Pro Server Administration.')
 
     - name: assert that smtp port answers
       shell: nc -v -w1 localhost 25
@@ -47,5 +51,5 @@
       changed_when: false
       register: reply_smtp
     - assert:
-        that: "'ESMTP CommuniGate Pro' in reply_smtp.stdout"
+        that: reply_smtp.stdout is search('ESMTP CommuniGate Pro')
 ...

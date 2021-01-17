@@ -1,7 +1,6 @@
 # ivansible.srv_cgpro
 
-[![Github Test Status](https://github.com/ivansible/srv-cgpro/workflows/Molecule%20test/badge.svg?branch=master)](https://github.com/ivansible/srv-cgpro/actions)
-[![Travis Test Status](https://travis-ci.org/ivansible/srv-cgpro.svg?branch=master)](https://travis-ci.org/ivansible/srv-cgpro)
+[![Github Test Status](https://github.com/ivansible/srv-cgpro/workflows/test/badge.svg?branch=master)](https://github.com/ivansible/srv-cgpro/actions)
 [![Ansible Galaxy](https://img.shields.io/badge/galaxy-ivansible.srv__cgpro-68a.svg?style=flat)](https://galaxy.ansible.com/ivansible/srv_cgpro/)
 
 This role provisions CommuniGate Pro integrated mail / telephony server on Linux.
@@ -190,4 +189,4 @@ MIT
 
 ## Author Information
 
-Created in 2018-2020 by [IvanSible](https://github.com/ivansible)
+Created in 2018-2021 by [IvanSible](https://github.com/ivansible)
