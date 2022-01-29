@@ -128,7 +128,7 @@ Custom favicon for webmail.
 
 ## Tags
 
-- `cgpro_all` -- the whole role
+- `srv_cgpro_all`, `cgpro_all` -- the whole role
 
 - `cgpro_install` -- install cgpro debian package, install utilities
                      required for configuration, tweak sysctl.

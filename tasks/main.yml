@@ -6,12 +6,17 @@
       - "certificate: {{ cgpro_ssl_cert }}"
       - "reset: {{ cgpro_reset }}"
       - "restore: {{ cgpro_restore }}"
-  tags: cgpro_all
+  tags:
+    - cgpro_all
+    - srv_cgpro_all
 
 - name: perform cgpro tasks as root
   import_tasks: root.yml
   become: true
-  tags: cgpro_all
+  when: lin_apt_arch == 'amd64'  ## unavailable on arm
+  tags:
+    - cgpro_all
+    - srv_cgpro_all
 
 - meta: flush_handlers
 ...
