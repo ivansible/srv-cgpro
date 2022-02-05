@@ -15,5 +15,5 @@
         state: stopped
         masked: true
       become: true
-      ignore_errors: true
+      failed_when: false
 ...

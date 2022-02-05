@@ -18,5 +18,6 @@
     - cgpro_all
     - srv_cgpro_all
 
-- meta: flush_handlers
+- name: flush handlers
+  meta: flush_handlers
 ...
