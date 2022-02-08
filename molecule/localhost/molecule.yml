@@ -4,7 +4,6 @@ provisioner:
   inventory:
     group_vars:
       molecule:
-        lin_systemd_tmpfiles: ${IVATEST_SYSTEMD_TMPFILES:-true}
   playbooks:
     prepare: ../default/prepare.yml
     converge: ../default/converge.yml

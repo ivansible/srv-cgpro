@@ -5,7 +5,6 @@ provisioner:
     group_vars:
       molecule:
         ansible_user: ansible
-        lin_systemd_tmpfiles: ${IVATEST_SYSTEMD_TMPFILES:-true}
   config_options:
     defaults:
       strategy: linear
